@@ -139,7 +139,7 @@ int lsh_exit(char** args);
 
 
 char* builtin_str[] = {
-    "cd",
+    "call",
     "help",
     "exit"
 };
@@ -160,7 +160,7 @@ int lsh_num_builtins()
 */
 int lsh_cd(char** args){
     if(args[1] == NULL){
-        fprintf(stderr, "lsh: expected argument to \"cd\"\n");
+        fprintf(stderr, "lsh: expected argument to \"call\"\n");
     } else {
         if(chdir(args[1]) != 0){
             perror("lsh");
