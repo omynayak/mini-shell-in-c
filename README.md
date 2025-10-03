@@ -1,7 +1,7 @@
 # Mini Shell in C!
 
 ## What is this?
-- This is a mini shell in C, made using the Stephen Brennan tutorial
+- This is a mini shell in C, capable of reading, parsing, and executing commands via the terminal.
 - The project was made purely from a learning standpoint to get a good feel of some system level concepts.
 
 ## How do I use it?
