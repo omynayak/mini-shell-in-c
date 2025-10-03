@@ -5,6 +5,8 @@
 #include<string.h>
 #include<sys/wait.h>
 #include<unistd.h>
+#include<limits.h>
+#include<time.h>
 
 // function declarations: 
 void lsh_loop();
@@ -26,6 +28,8 @@ int main(int argc, char** argv)
 
 void lsh_loop()
 {
+    char cwd[PATH_MAX];
+
     // the line we read
     char* line;
     
@@ -37,7 +41,8 @@ void lsh_loop()
 
     do
     {
-        printf("> ");
+        getcwd(cwd, sizeof(cwd));
+        printf("%s>> ",cwd);
         // read line, parse it, and execute
         line = lsh_readLine();
         args = lsh_parse(line);
@@ -113,16 +118,18 @@ int lsh_launch(char** args)
 
     pid = fork();
     if(pid == 0){
+        // child process runs the command and checks for an error
         if(execvp(args[0], args) == -1){
             perror("lsh");
         }
         exit(EXIT_FAILURE);
     } else if (pid < 0) {
+        // If there was an error in making the child process
         perror("lsh");
     } else {
         do {
             wpid = waitpid(pid, &status, WUNTRACED);
-        } while (!WIFEXITED(status) && WIFSIGNALED(status));
+        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
     }
 
     return 1;
@@ -136,17 +143,20 @@ int lsh_launch(char** args)
 int lsh_cd(char **args);
 int lsh_help(char** args);
 int lsh_exit(char** args);
+int lsh_time(char** args);
 
 
 char* builtin_str[] = {
     "call",
     "help",
+    "gt",
     "exit"
 };
 
 int (*builtin_func[]) (char **) = {
     &lsh_cd,
     &lsh_help,
+    &lsh_time,
     &lsh_exit
 };
 
@@ -172,7 +182,7 @@ int lsh_cd(char** args){
 int lsh_help(char **args)
 {
   int i;
-  printf("Manel Omy Nayak's LSH\n");
+  printf("Manel Om Nayak's LSH\n");
   printf("Type program names and arguments, and hit enter.\n");
   printf("The following are built in:\n");
 
@@ -206,4 +216,16 @@ int lsh_execute(char **args)
   }
 
   return lsh_launch(args);
+}
+
+int lsh_time(char** args)
+{
+    time_t currentTime;
+    time(&currentTime);
+
+    currentTime += 19800;
+    char** tokens = lsh_parse(ctime(&currentTime));
+
+    printf("Today is: %s, %s %s %s, Time: %s\n",tokens[0], tokens[1], tokens[2], tokens[4], tokens[3]);
+    return 1;
 }
