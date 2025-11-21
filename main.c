@@ -5,8 +5,11 @@
 #include<string.h>
 #include<sys/wait.h>
 #include<unistd.h>
-#include<limits.h>
 #include<time.h>
+
+#ifndef PATH_MAX
+#define PATH_MAX 4096 
+#endif
 
 // function declarations: 
 void lsh_loop();
@@ -144,12 +147,13 @@ int lsh_cd(char **args);
 int lsh_help(char** args);
 int lsh_exit(char** args);
 int lsh_time(char** args);
-
+int lsh_filestruct(char** args);
 
 char* builtin_str[] = {
     "call",
     "help",
     "gt",
+    "filestruct",
     "exit"
 };
 
@@ -157,6 +161,7 @@ int (*builtin_func[]) (char **) = {
     &lsh_cd,
     &lsh_help,
     &lsh_time,
+    &lsh_filestruct,
     &lsh_exit
 };
 
@@ -227,5 +232,34 @@ int lsh_time(char** args)
     char** tokens = lsh_parse(ctime(&currentTime));
 
     printf("Today is: %s, %s %s %s, Time: %s\n",tokens[0], tokens[1], tokens[2], tokens[4], tokens[3]);
+    return 1;
+}
+
+#define DELIM "/"
+int lsh_filestruct(char** args)
+{
+    char cwd[PATH_MAX];
+
+    getcwd(cwd, sizeof(cwd));
+
+    char* token = strtok(cwd, DELIM);
+    char** tokens = malloc(sizeof(char*) * 64);
+    int index = 0;
+    while(token){
+        tokens[index++] = token;
+        token = strtok(NULL, DELIM);
+    }
+
+    tokens[index] = NULL;
+
+
+
+    printf("%s|\n",tokens[0]);
+    int count  = 1;
+    while(tokens[count] != NULL){
+        for(size_t j = 0; j < count; j++) printf("\t");
+        printf("--->%s|\n",tokens[count++]);
+    }
+
     return 1;
 }
