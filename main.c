@@ -46,6 +46,7 @@ void lsh_loop()
     {
         getcwd(cwd, sizeof(cwd));
         printf("%s>> ",cwd);
+
         // read line, parse it, and execute
         line = lsh_readLine();
         args = lsh_parse(line);
@@ -63,7 +64,6 @@ char* lsh_readLine()
     ssize_t buffersize = 0;
 
     // getline() takes care of most of it
-    // (refer notes)
     if(getline(&line, &buffersize, stdin) == -1){
         if(feof(stdin)){
             // if stdin detects an eof
@@ -77,14 +77,16 @@ char* lsh_readLine()
     return line;
 }
 
+// String parser function : 
 #define LSH_TOK_BUFSIZE 64
 #define LSH_TOK_DELIM " \t\r\n\a"
 char** lsh_parse(char* line)
 {
+    // Allocate a buffer size, array of strings, and a string
     int bufsize = LSH_TOK_BUFSIZE;
     char** tokens = malloc(bufsize * sizeof(char*));
     char* token;
-    int position = 0;
+    int position = 0; // Current index of args we are writing to 
 
     if(!tokens){
         fprintf(stderr, "Token array error\n");
@@ -93,6 +95,7 @@ char** lsh_parse(char* line)
 
     token = strtok(line, LSH_TOK_DELIM);
 
+    // Read string into token and pass to args till we reach the end (NULL pointer)
     while(token != NULL){
         tokens[position] = token;
         position++;
@@ -130,6 +133,7 @@ int lsh_launch(char** args)
         // If there was an error in making the child process
         perror("lsh");
     } else {
+        // Parent waits till child processes exit 
         do {
             wpid = waitpid(pid, &status, WUNTRACED);
         } while (!WIFEXITED(status) && !WIFSIGNALED(status));
