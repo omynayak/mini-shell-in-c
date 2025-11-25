@@ -18,7 +18,7 @@ Runs any program using `fork()`, `execvp()`, and `waitpid()`
 
 ## Project Structure:
 ```
-.
+mini-shell-in-c
 ├── main.cpp
 ├── Makefile
 └── README.md
